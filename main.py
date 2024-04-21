@@ -1,34 +1,13 @@
-from contextvars import Token
-import os
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.hash import bcrypt
-from passlib.context import CryptContext
-import jwt
-from datetime import datetime, timedelta
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from dotenv import load_dotenv
-import sqlalchemy
-from sqlalchemy.ext.declarative import declarative_base
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-# Database configuration
-load_dotenv()
-DB_URL = os.getenv("DB_URL")
+from modules import models
+from modules.database import SessionLocal, engine
+from modules.models import Account
+from pydantic import BaseModel
 
-engine = create_engine(DB_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-# Database models
-class Account(Base):
-    __tablename__ = "account"
-    account_id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, index=True)
-    firstname = sqlalchemy.Column(sqlalchemy.String)
-    lastname = sqlalchemy.Column(sqlalchemy.String)
-    middlename = sqlalchemy.Column(sqlalchemy.String)
-    username = sqlalchemy.Column(sqlalchemy.String, unique=True)
-    password = sqlalchemy.Column(sqlalchemy.String)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -46,20 +25,22 @@ def get_account(db: Session = Depends(get_db)):
     accounts = db.query(Account).all()
     return accounts
 
-# Commented out code
-# @app.post("/login", response_model=Token)
-# async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-#     user = authenticate_user(db, form_data.username, form_data.password)
+class User(BaseModel):
+    username: str
+    password: str
 
-#     if not user:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Incorrect username or password",
-#             headers={"WWW-Authenticate": "Bearer"},
-#         )
+@app.post("/login")
+def login(user: User, db: Session = Depends(get_db)):
+    account = db.query(Account).filter(Account.username == user.username).first()
+    if not account or not account.verify_password(user.password):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    return {"message": "Login successful"}
 
-#     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-#     access_token = create_access_token(
-#         data={"sub": user.username}, expires_delta=access_token_expires
-#     )
-#     return {"access_token": access_token, "token_type": "bearer"}
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For development, allow all origins (restrict in production)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
