@@ -14,8 +14,13 @@ class Account(Base):
     def verify_password(self, password: str) -> bool:
         # Add your password verification logic here
         return self.password == password
-    
 
-class User(BaseModel):
-    username: str
-    password: str
+
+class Activity(Base):
+    __tablename__ = "activity"
+    activity_id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, index=True)
+    account_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("account.account_id"))
+    activity = sqlalchemy.Column(sqlalchemy.String)
+    date = sqlalchemy.Column(sqlalchemy.Date)
+    time = sqlalchemy.Column(sqlalchemy.Time)
+    account = sqlalchemy.orm.relationship("Account", back_populates="activity")

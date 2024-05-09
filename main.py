@@ -20,7 +20,7 @@ def get_db():
         db.close()
 
 # Endpoints
-@app.get("/users")
+@app.get("/test/users")
 def get_account(db: Session = Depends(get_db)):
     accounts = db.query(Account).all()
     return accounts
