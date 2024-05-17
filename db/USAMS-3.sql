@@ -1,0 +1,378 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Generation Time: May 18, 2024 at 12:42 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `USAMS`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ACCOUNT`
+--
+
+CREATE TABLE `ACCOUNT` (
+  `ACCOUNT_ID` int(11) NOT NULL,
+  `USERNAME` varchar(255) NOT NULL,
+  `PASSWORD` varchar(255) NOT NULL,
+  `LASTNAME` varchar(255) NOT NULL,
+  `FIRSTNAME` varchar(255) NOT NULL,
+  `MIDDLENAME` varchar(255) DEFAULT NULL,
+  `DATETIME_CREATED` datetime NOT NULL DEFAULT current_timestamp(),
+  `STATUSCODE` int(11) DEFAULT NULL,
+  `EMP_ACCOUNT` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ACCOUNT`
+--
+
+INSERT INTO `ACCOUNT` (`ACCOUNT_ID`, `USERNAME`, `PASSWORD`, `LASTNAME`, `FIRSTNAME`, `MIDDLENAME`, `DATETIME_CREATED`, `STATUSCODE`, `EMP_ACCOUNT`) VALUES
+(1, 'admin', 'admin123', 'Doe', 'John', 'Dan', '2024-05-17 22:22:47', 1, 1001),
+(2, 'osad', 'osad123', 'Dan', 'Jane', 'Doe', '2024-05-17 22:25:31', 1, 1002);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ACCOUNT_ROLE`
+--
+
+CREATE TABLE `ACCOUNT_ROLE` (
+  `ACCOUNT_ROLE_ID` int(11) NOT NULL,
+  `ACCOUNT_ID` int(11) DEFAULT NULL,
+  `ROLE_ID` int(11) DEFAULT NULL,
+  `GRANTER_ACCOUNT` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ACCOUNT_ROLE`
+--
+
+INSERT INTO `ACCOUNT_ROLE` (`ACCOUNT_ROLE_ID`, `ACCOUNT_ID`, `ROLE_ID`, `GRANTER_ACCOUNT`) VALUES
+(1, 1, 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ACCOUNT_SESSION`
+--
+
+CREATE TABLE `ACCOUNT_SESSION` (
+  `ACCOUNT_SESSION_ID` int(11) NOT NULL,
+  `ACCOUNT_ID` int(11) NOT NULL,
+  `SESSION_KEY` varchar(255) NOT NULL,
+  `IP_ADDRESS` varchar(255) NOT NULL,
+  `DATETIME_CREATED` datetime NOT NULL,
+  `DATETIME_LAST_REQUEST` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ACTIVITY`
+--
+
+CREATE TABLE `ACTIVITY` (
+  `ACTIVITY_ID` int(11) NOT NULL,
+  `SEMESTER_ID` int(11) NOT NULL,
+  `CODE` varchar(10) NOT NULL,
+  `LABEL` varchar(100) NOT NULL,
+  `DESCRIPTION` varchar(255) DEFAULT NULL,
+  `LOCATION` varchar(100) DEFAULT NULL,
+  `COLLEGE_ID` int(11) NOT NULL,
+  `ACTIVITY_START_DATE` date NOT NULL,
+  `ACTIVITY_END_DATE` date NOT NULL,
+  `ACTIVITY_STATUS` enum('active','inactive') NOT NULL,
+  `APPROVED_BY` int(11) DEFAULT NULL,
+  `APPROVED_DATE` date DEFAULT NULL,
+  `DISAPPROVED_BY` int(11) DEFAULT NULL,
+  `DISAPPROVED_DATE` date DEFAULT NULL,
+  `DISAPPROVED_REASON` varchar(255) DEFAULT NULL,
+  `DISAPROVED_DATETIME` datetime DEFAULT NULL,
+  `DATETIME_CREATED` datetime NOT NULL,
+  `DATETIME_UPDATED` datetime NOT NULL,
+  `STATUSCODE` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ATTENDANCE`
+--
+
+CREATE TABLE `ATTENDANCE` (
+  `ATTENDANCE_ID` int(11) NOT NULL,
+  `ACTIVITY_ID` int(11) DEFAULT NULL,
+  `ACTIVITY_CODE` varchar(255) DEFAULT NULL,
+  `CARD_ID` varchar(255) DEFAULT NULL,
+  `STUDENT_ID` int(11) DEFAULT NULL,
+  `EMPLOYEE_ID` int(11) DEFAULT NULL,
+  `STUDENT_NUMBER` varchar(255) DEFAULT NULL,
+  `TRANSACTION_TYPE_ID` int(11) DEFAULT NULL,
+  `USER_ID` int(11) DEFAULT NULL,
+  `IP_ADDRESS` varchar(255) DEFAULT NULL,
+  `DATETIME_CREATED` datetime DEFAULT NULL,
+  `DATE_CREATED` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `EVENT_LOG`
+--
+
+CREATE TABLE `EVENT_LOG` (
+  `EVENT_LOG_ID` int(11) NOT NULL,
+  `ACCOUNT_ID` int(11) DEFAULT NULL,
+  `EVENT_DESCRIPTION` varchar(255) DEFAULT NULL,
+  `IP_ADDRESS` varchar(255) DEFAULT NULL,
+  `DATETIME_ADDED` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ROLE`
+--
+
+CREATE TABLE `ROLE` (
+  `ROLE_ID` int(11) NOT NULL,
+  `LABEL` varchar(255) NOT NULL,
+  `DESCRIPTION` varchar(255) NOT NULL,
+  `DATETIME_CREATED` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ROLE`
+--
+
+INSERT INTO `ROLE` (`ROLE_ID`, `LABEL`, `DESCRIPTION`, `DATETIME_CREATED`) VALUES
+(1, 'ADMIN', 'Administrator', '2024-05-17 16:23:19'),
+(2, 'OSA', 'Office of Student Affairs', '2024-05-17 16:23:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `STATUSCODE`
+--
+
+CREATE TABLE `STATUSCODE` (
+  `STATUSCODE_ID` int(11) NOT NULL,
+  `LABEL` varchar(255) NOT NULL,
+  `STATUSCODE_GROUP_ID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `STATUSCODE`
+--
+
+INSERT INTO `STATUSCODE` (`STATUSCODE_ID`, `LABEL`, `STATUSCODE_GROUP_ID`) VALUES
+(1, 'ACTIVATED', 1),
+(2, 'DEACTIVATED', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `STATUSCODE_GROUP`
+--
+
+CREATE TABLE `STATUSCODE_GROUP` (
+  `STATUS_GROUP_ID` int(11) NOT NULL,
+  `TABLE_NAME` varchar(255) NOT NULL,
+  `RANGE_START` varchar(255) NOT NULL,
+  `RANGE_END` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `STATUSCODE_GROUP`
+--
+
+INSERT INTO `STATUSCODE_GROUP` (`STATUS_GROUP_ID`, `TABLE_NAME`, `RANGE_START`, `RANGE_END`) VALUES
+(1, 'ON', '', ''),
+(2, 'OFF', '', '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `TRANSACTION_TYPE`
+--
+
+CREATE TABLE `TRANSACTION_TYPE` (
+  `TRANSACTION_TYPE_ID` int(11) NOT NULL,
+  `LABEL` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `ACCOUNT`
+--
+ALTER TABLE `ACCOUNT`
+  ADD PRIMARY KEY (`ACCOUNT_ID`),
+  ADD KEY `ACCOUNT_IBFK1` (`STATUSCODE`);
+
+--
+-- Indexes for table `ACCOUNT_ROLE`
+--
+ALTER TABLE `ACCOUNT_ROLE`
+  ADD PRIMARY KEY (`ACCOUNT_ROLE_ID`),
+  ADD UNIQUE KEY `ROLE_ID` (`ROLE_ID`),
+  ADD KEY `ACCOUNT_ID` (`ACCOUNT_ID`);
+
+--
+-- Indexes for table `ACCOUNT_SESSION`
+--
+ALTER TABLE `ACCOUNT_SESSION`
+  ADD PRIMARY KEY (`ACCOUNT_SESSION_ID`);
+
+--
+-- Indexes for table `ACTIVITY`
+--
+ALTER TABLE `ACTIVITY`
+  ADD PRIMARY KEY (`ACTIVITY_ID`),
+  ADD KEY `APPROVED_BY` (`APPROVED_BY`),
+  ADD KEY `DISAPPROVED_BY` (`DISAPPROVED_BY`),
+  ADD KEY `STATUSCODE` (`STATUSCODE`);
+
+--
+-- Indexes for table `ATTENDANCE`
+--
+ALTER TABLE `ATTENDANCE`
+  ADD PRIMARY KEY (`ATTENDANCE_ID`);
+
+--
+-- Indexes for table `EVENT_LOG`
+--
+ALTER TABLE `EVENT_LOG`
+  ADD PRIMARY KEY (`EVENT_LOG_ID`),
+  ADD KEY `ACCOUNT_ID` (`ACCOUNT_ID`);
+
+--
+-- Indexes for table `ROLE`
+--
+ALTER TABLE `ROLE`
+  ADD PRIMARY KEY (`ROLE_ID`);
+
+--
+-- Indexes for table `STATUSCODE`
+--
+ALTER TABLE `STATUSCODE`
+  ADD PRIMARY KEY (`STATUSCODE_ID`),
+  ADD KEY `STATUSCODE_GROUP_ID` (`STATUSCODE_GROUP_ID`);
+
+--
+-- Indexes for table `STATUSCODE_GROUP`
+--
+ALTER TABLE `STATUSCODE_GROUP`
+  ADD PRIMARY KEY (`STATUS_GROUP_ID`);
+
+--
+-- Indexes for table `TRANSACTION_TYPE`
+--
+ALTER TABLE `TRANSACTION_TYPE`
+  ADD PRIMARY KEY (`TRANSACTION_TYPE_ID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `ACCOUNT`
+--
+ALTER TABLE `ACCOUNT`
+  MODIFY `ACCOUNT_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `ACCOUNT_SESSION`
+--
+ALTER TABLE `ACCOUNT_SESSION`
+  MODIFY `ACCOUNT_SESSION_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ACTIVITY`
+--
+ALTER TABLE `ACTIVITY`
+  MODIFY `ACTIVITY_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ATTENDANCE`
+--
+ALTER TABLE `ATTENDANCE`
+  MODIFY `ATTENDANCE_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ROLE`
+--
+ALTER TABLE `ROLE`
+  MODIFY `ROLE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `STATUSCODE`
+--
+ALTER TABLE `STATUSCODE`
+  MODIFY `STATUSCODE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `STATUSCODE_GROUP`
+--
+ALTER TABLE `STATUSCODE_GROUP`
+  MODIFY `STATUS_GROUP_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `ACCOUNT`
+--
+ALTER TABLE `ACCOUNT`
+  ADD CONSTRAINT `ACCOUNT_IBFK1` FOREIGN KEY (`STATUSCODE`) REFERENCES `STATUSCODE` (`STATUSCODE_ID`);
+
+--
+-- Constraints for table `ACCOUNT_ROLE`
+--
+ALTER TABLE `ACCOUNT_ROLE`
+  ADD CONSTRAINT `ACCOUNT_ROLE_IBFK_1` FOREIGN KEY (`ACCOUNT_ID`) REFERENCES `ACCOUNT` (`ACCOUNT_ID`);
+
+--
+-- Constraints for table `ACTIVITY`
+--
+ALTER TABLE `ACTIVITY`
+  ADD CONSTRAINT `ACTIVITY_IBFK_1` FOREIGN KEY (`APPROVED_BY`) REFERENCES `ACCOUNT` (`ACCOUNT_ID`),
+  ADD CONSTRAINT `ACTIVITY_IBFK_2` FOREIGN KEY (`DISAPPROVED_BY`) REFERENCES `ACCOUNT` (`ACCOUNT_ID`),
+  ADD CONSTRAINT `ACTIVITY_IBFK_3` FOREIGN KEY (`STATUSCODE`) REFERENCES `STATUSCODE` (`STATUSCODE_ID`);
+
+--
+-- Constraints for table `EVENT_LOG`
+--
+ALTER TABLE `EVENT_LOG`
+  ADD CONSTRAINT `EVENT_LOG_IBFK_1` FOREIGN KEY (`ACCOUNT_ID`) REFERENCES `ACCOUNT` (`ACCOUNT_ID`);
+
+--
+-- Constraints for table `STATUSCODE`
+--
+ALTER TABLE `STATUSCODE`
+  ADD CONSTRAINT `STATUSCODE_IBFK_1` FOREIGN KEY (`STATUSCODE_GROUP_ID`) REFERENCES `STATUSCODE_GROUP` (`STATUS_GROUP_ID`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
