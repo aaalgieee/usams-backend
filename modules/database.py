@@ -5,7 +5,7 @@ import os
 import sqlalchemy
 
 load_dotenv()
-DB_URL = os.getenv("DB_URL")
+DB_URL = "mariadb+pymysql://dev@localhost:3306/USAMS"
 
 engine = sqlalchemy.create_engine(DB_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
