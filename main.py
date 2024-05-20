@@ -13,6 +13,23 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+from fastapi import Request
+
+@app.middleware("http")
+async def add_cors_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
+
 # Dependency function to get database session
 def get_db():
     try:
@@ -38,14 +55,20 @@ def get_account(db: Session = Depends(get_db)):
     accounts = db.query(Account).all()
     return accounts
 
-class User(BaseModel):
+class Users(BaseModel):
     username: str
     password: str
+    firstname: str
+    lastname: str
+
+class User(BaseModel):
+    username: str
+    password:str
 
 class Event(BaseModel):
     # activity_id: Optional[int]
     # semester_id: Optional[int]
-    code: str
+    #code: str
     label: str
     # description: Optional[str]
     location: str
@@ -64,7 +87,7 @@ def login(user: User, db: Session = Depends(get_db)):
     return {"message": "Login successful"}
 
 @app.post("/register")
-def register(user: User, db: Session = Depends(get_db)):
+def register(user: Users, db: Session = Depends(get_db)):
     account = Account(**user.dict())
     db.add(account)
     db.commit()
@@ -77,7 +100,7 @@ def get_events(db: Session = Depends(get_db)):
 
 @app.post("/events")
 def add_event(evt: Event, db: Session = Depends(get_db)):
-    activity = Activity(**evt.model_dump())
+    activity = Activity(**evt.dict())
     # add approved_by default admin user to activity
     activity.approved_by = 1
 
@@ -139,13 +162,6 @@ def delete_attendance(attendance_id: int, db: Session = Depends(get_db)):
     log_event(db, attendance.account_id, f"Deleted attendance for activity {attendance.activity_id}", "")
     return {"message": "Attendance deleted"}
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # For development, allow all origins (restrict in production)
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 if __name__ == "__main__":
     import uvicorn
