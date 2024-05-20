@@ -26,6 +26,6 @@ database
 *.env
 
 venv
-usams.db
+
 
 __pycache__
