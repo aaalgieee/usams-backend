@@ -140,6 +140,9 @@ def update_event(activity_id: int, activity: Event, db: Session = Depends(get_db
 
 @app.delete("/events/{activity_id}")
 def delete_event(activity_id: int, db: Session = Depends(get_db)):
+    attendance = db.query(Attendance).filter(Attendance.activity_id == activity_id).first()
+    if attendance:
+        db.delete(attendance)
     activity = db.query(Activity).filter(Activity.activity_id == activity_id).first()
     if not activity:
         raise HTTPException(status_code=404, detail="Event not found")
