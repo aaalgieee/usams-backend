@@ -1,13 +1,17 @@
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy import DATE
 from sqlalchemy.orm import Session
 
+from sqlalchemy.sql import func, cast
 from modules import models
 from modules.database import SessionLocal, engine
-from modules.models import Account, Activity, Attendance, EventLog
+from modules.models import Account, Activity, Attendance, Students, Statuscode
 from pydantic import BaseModel, Field
-from datetime import date, datetime
+from datetime import date, datetime, time
+from typing import List
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -66,18 +70,31 @@ class User(BaseModel):
     password:str
 
 class Event(BaseModel):
-    # activity_id: Optional[int]
+    activity_id: Optional[int]
     # semester_id: Optional[int]
     #code: str
     label: str
-    # description: Optional[str]
+    department: str
     location: str
     # college_id: Optional[int]
     activity_start_date: date
     activity_end_date: date
-    activity_status: Optional[str] = Field(default="Active")
-    datetime_created: Optional[datetime] = Field(default=datetime.now())
+    activity_status: Optional[str] = Field(default="inactive")
+    #datetime_created: Optional[datetime] = Field(default=datetime.now())
     # approved_by: Optional[int]
+
+class Students(BaseModel):
+    student_number: int
+    lastname: str
+    firstname: str
+    middlename: Optional[str]
+
+class _Attendance(BaseModel):
+    attendance_id: Optional[int]
+    student_number: int
+    activity_id: int
+    datetime_created: datetime = Field(default=datetime.now())
+
 
 @app.post("/login")
 def login(user: User, db: Session = Depends(get_db)):
@@ -104,6 +121,13 @@ def add_event(evt: Event, db: Session = Depends(get_db)):
     # add approved_by default admin user to activity
     activity.approved_by = 1
 
+    # Increment activity_id
+    last_activity = db.query(Activity).order_by(Activity.activity_id.desc()).first()
+    if last_activity:
+        activity.activity_id = last_activity.activity_id + 1
+    else:
+        activity.activity_id = 1
+
     db.add(activity)
     db.commit()
     return {"message": "Event added"}
@@ -123,24 +147,61 @@ def delete_event(activity_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Event deleted"}
 
-@app.get("/attendance")
-def get_attendance(db: Session = Depends(get_db)):
-    attendance = db.query(Attendance).all()
-    return attendance
 
-class _Attendance(BaseModel):
-    activity_id: int
-    account_id: int
-    attendance_status: str = Field(default="Present")
-    datetime_created: datetime = Field(default=datetime.now())
+@app.get("/reports/{activity_id}")
+def get_attendance(activity_id: int, db: Session = Depends(get_db)):
+    attendance = db.query(models.Attendance, models.Students, models.Activity)\
+        .join(models.Students)\
+        .join(models.Activity)\
+        .filter(models.Attendance.activity_id == activity_id)\
+        .all()
+    
+    attendance_details = []
+    for record in attendance:
+        attendance_details.append({
+            "attendance_id": record.Attendance.attendance_id,
+            "activity_id": record.Attendance.activity_id,
+            "student_number": record.Attendance.student_number,
+            "datetime_created": record.Attendance.datetime_created,
+            "firstname": record.Students.firstname,
+            "lastname": record.Students.lastname,
+            "activity_label": record.Activity.label
+        })
+    return attendance_details
+
+
+
 
 @app.post("/attendance")
 def add_attendance(att: _Attendance, db: Session = Depends(get_db)):
-    attendance = Attendance(**att.dict())
+    # Check if attendance for the same activity and date already exists
+    today = datetime.now().date()
+    existing_attendance = db.query(Attendance).filter(
+        Attendance.activity_id == att.activity_id,
+        cast(Attendance.datetime_created, DATE) == today,
+        Attendance.student_number == att.student_number
+    ).first()
+    
+    if existing_attendance:
+        return {"message": "Attendance already registered for this activity today"}
+
+    attendance = Attendance(
+        student_number=att.student_number, 
+        activity_id=att.activity_id, 
+        datetime_created=datetime.now()
+    )
+
+    # Increment attendance_id
+    last_attendance = db.query(Attendance).order_by(Attendance.attendance_id.desc()).first()
+    if last_attendance:
+        attendance.attendance_id = last_attendance.attendance_id + 1
+    else:
+        attendance.attendance_id = 1
+
     db.add(attendance)
     db.commit()
 
-    log_event(db, att.account_id, f"Added attendance for activity {att.activity_id}", "")
+    log_event(db, 0, f"Added attendance for activity {att.activity_id}", "")
     return {"message": "Attendance added"}
 
 @app.patch("/attendance/{attendance_id}")
