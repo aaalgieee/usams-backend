@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 20, 2024 at 09:25 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: May 22, 2024 at 03:01 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -62,41 +62,6 @@ INSERT INTO `account` (`ACCOUNT_ID`, `USERNAME`, `PASSWORD`, `LASTNAME`, `FIRSTN
 -- --------------------------------------------------------
 
 --
--- Table structure for table `account_role`
---
-
-CREATE TABLE `account_role` (
-  `ACCOUNT_ROLE_ID` int(11) NOT NULL,
-  `ACCOUNT_ID` int(11) DEFAULT NULL,
-  `ROLE_ID` int(11) DEFAULT NULL,
-  `GRANTER_ACCOUNT` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `account_role`
---
-
-INSERT INTO `account_role` (`ACCOUNT_ROLE_ID`, `ACCOUNT_ID`, `ROLE_ID`, `GRANTER_ACCOUNT`) VALUES
-(1, 1, 1, NULL);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `account_session`
---
-
-CREATE TABLE `account_session` (
-  `ACCOUNT_SESSION_ID` int(11) NOT NULL,
-  `ACCOUNT_ID` int(11) NOT NULL,
-  `SESSION_KEY` varchar(255) NOT NULL,
-  `IP_ADDRESS` varchar(255) NOT NULL,
-  `DATETIME_CREATED` datetime NOT NULL,
-  `DATETIME_LAST_REQUEST` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `activity`
 --
 
@@ -104,8 +69,8 @@ CREATE TABLE `activity` (
   `ACTIVITY_ID` int(11) NOT NULL,
   `SEMESTER_ID` int(11) DEFAULT NULL,
   `CODE` varchar(10) DEFAULT NULL,
-  `LABEL` varchar(100) DEFAULT NULL,
-  `DESCRIPTION` varchar(255) DEFAULT NULL,
+  `LABEL` varchar(255) DEFAULT NULL,
+  `DEPARTMENT` varchar(255) DEFAULT NULL,
   `LOCATION` varchar(100) DEFAULT NULL,
   `COLLEGE_ID` int(11) DEFAULT NULL,
   `ACTIVITY_START_DATE` date DEFAULT NULL,
@@ -126,13 +91,9 @@ CREATE TABLE `activity` (
 -- Dumping data for table `activity`
 --
 
-INSERT INTO `activity` (`ACTIVITY_ID`, `SEMESTER_ID`, `CODE`, `LABEL`, `DESCRIPTION`, `LOCATION`, `COLLEGE_ID`, `ACTIVITY_START_DATE`, `ACTIVITY_END_DATE`, `ACTIVITY_STATUS`, `APPROVED_BY`, `APPROVED_DATE`, `DISAPPROVED_BY`, `DISAPPROVED_DATE`, `DISAPPROVED_REASON`, `DISAPROVED_DATETIME`, `DATETIME_CREATED`, `DATETIME_UPDATED`, `STATUSCODE`) VALUES
-(202401, 232402, '001', 'Intramurals', 'Yearly Intramural Event', 'Banke(Main)', 0, '2024-05-01', '2024-05-10', 'active', NULL, NULL, NULL, NULL, NULL, NULL, '2024-05-18 02:48:30', '2024-05-18 02:48:30', 1),
-(202402, NULL, 'SNACK_PA', 'SNACK Partylist', NULL, 'Boni', NULL, '2001-01-01', '2001-02-02', 'active', 1, NULL, NULL, NULL, NULL, NULL, '2024-05-18 14:08:48', NULL, NULL),
-(202403, NULL, NULL, '1', NULL, 'Boni', NULL, '2001-10-20', '2002-12-21', 'active', 1, NULL, NULL, NULL, NULL, NULL, '2024-05-18 14:22:43', NULL, NULL),
-(202404, NULL, NULL, 'College Week', NULL, 'Main', NULL, '2024-10-20', '2024-10-25', 'active', 1, NULL, NULL, NULL, NULL, NULL, '2024-05-18 14:22:43', NULL, NULL),
-(202405, NULL, NULL, 'USG', NULL, 'Boni', NULL, '2004-01-20', '2005-01-21', 'active', 1, NULL, NULL, NULL, NULL, NULL, '2024-05-18 16:10:27', NULL, NULL),
-(202406, NULL, NULL, 'CCS Night', NULL, 'Boni', NULL, '2024-05-20', '2024-05-28', 'active', 1, NULL, NULL, NULL, NULL, NULL, '2024-05-18 16:10:27', NULL, NULL);
+INSERT INTO `activity` (`ACTIVITY_ID`, `SEMESTER_ID`, `CODE`, `LABEL`, `DEPARTMENT`, `LOCATION`, `COLLEGE_ID`, `ACTIVITY_START_DATE`, `ACTIVITY_END_DATE`, `ACTIVITY_STATUS`, `APPROVED_BY`, `APPROVED_DATE`, `DISAPPROVED_BY`, `DISAPPROVED_DATE`, `DISAPPROVED_REASON`, `DISAPROVED_DATETIME`, `DATETIME_CREATED`, `DATETIME_UPDATED`, `STATUSCODE`) VALUES
+(3, NULL, NULL, 'Intramurals', 'USG', 'Annex', NULL, '2024-05-22', '2024-05-23', 'inactive', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, NULL, NULL, 'Day2', 'CCS', 'Main', NULL, '2024-05-10', '2024-05-24', 'inactive', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -142,53 +103,28 @@ INSERT INTO `activity` (`ACTIVITY_ID`, `SEMESTER_ID`, `CODE`, `LABEL`, `DESCRIPT
 
 CREATE TABLE `attendance` (
   `ATTENDANCE_ID` int(11) NOT NULL,
-  `ACTIVITY_ID` int(11) DEFAULT NULL,
-  `ACTIVITY_CODE` varchar(255) DEFAULT NULL,
-  `CARD_ID` varchar(255) DEFAULT NULL,
-  `STUDENT_ID` int(11) DEFAULT NULL,
-  `EMPLOYEE_ID` int(11) DEFAULT NULL,
-  `STUDENT_NUMBER` varchar(255) DEFAULT NULL,
-  `TRANSACTION_TYPE_ID` int(11) DEFAULT NULL,
-  `USER_ID` int(11) DEFAULT NULL,
-  `IP_ADDRESS` varchar(255) DEFAULT NULL,
-  `DATETIME_CREATED` datetime DEFAULT NULL,
-  `DATE_CREATED` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `event_log`
---
-
-CREATE TABLE `event_log` (
-  `EVENT_LOG_ID` int(11) NOT NULL,
-  `ACCOUNT_ID` int(11) DEFAULT NULL,
-  `EVENT_DESCRIPTION` varchar(255) DEFAULT NULL,
-  `IP_ADDRESS` varchar(255) DEFAULT NULL,
-  `DATETIME_ADDED` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `role`
---
-
-CREATE TABLE `role` (
-  `ROLE_ID` int(11) NOT NULL,
-  `LABEL` varchar(255) NOT NULL,
-  `DESCRIPTION` varchar(255) NOT NULL,
+  `ACTIVITY_ID` int(255) DEFAULT NULL,
+  `STUDENT_NUMBER` int(255) DEFAULT NULL,
   `DATETIME_CREATED` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `role`
+-- Dumping data for table `attendance`
 --
 
-INSERT INTO `role` (`ROLE_ID`, `LABEL`, `DESCRIPTION`, `DATETIME_CREATED`) VALUES
-(1, 'ADMIN', 'Administrator', '2024-05-17 16:23:19'),
-(2, 'OSA', 'Office of Student Affairs', '2024-05-17 16:23:19');
+INSERT INTO `attendance` (`ATTENDANCE_ID`, `ACTIVITY_ID`, `STUDENT_NUMBER`, `DATETIME_CREATED`) VALUES
+(1, 3, 2001, '2024-05-22 06:03:06'),
+(2, 3, 2002, '2024-05-22 07:38:00'),
+(3, 3, 2003, '2024-05-22 07:38:01'),
+(4, 3, 2004, '2024-05-22 07:38:02'),
+(5, 3, 2005, '2024-05-22 07:38:03'),
+(6, 3, 2006, '2024-05-22 07:38:04'),
+(7, 4, 2001, '2024-05-22 07:40:55'),
+(8, 4, 2002, '2024-05-22 07:40:56'),
+(9, 4, 2003, '2024-05-22 07:40:56'),
+(10, 4, 2004, '2024-05-22 07:40:57'),
+(11, 4, 2005, '2024-05-22 07:40:58'),
+(12, 4, 2006, '2024-05-22 07:40:58');
 
 -- --------------------------------------------------------
 
@@ -234,13 +170,27 @@ INSERT INTO `statuscode_group` (`STATUS_GROUP_ID`, `TABLE_NAME`, `RANGE_START`, 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `transaction_type`
+-- Table structure for table `students`
 --
 
-CREATE TABLE `transaction_type` (
-  `TRANSACTION_TYPE_ID` int(11) NOT NULL,
-  `LABEL` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE `students` (
+  `STUDENT_NUMBER` int(255) NOT NULL,
+  `lastname` varchar(255) NOT NULL,
+  `firstname` varchar(255) NOT NULL,
+  `middlename` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `students`
+--
+
+INSERT INTO `students` (`STUDENT_NUMBER`, `lastname`, `firstname`, `middlename`) VALUES
+(2001, 'ORIG', 'AL GABRIEL', NULL),
+(2002, 'MARINAY', 'WILFREDO', NULL),
+(2003, 'ESPINOSA', 'PRINCESS MICAH', NULL),
+(2004, 'TAN', 'KYLE', NULL),
+(2005, 'DOE', 'JOHN', NULL),
+(2006, 'DELA CRUZ', 'JANE', NULL);
 
 --
 -- Indexes for dumped tables
@@ -252,20 +202,6 @@ CREATE TABLE `transaction_type` (
 ALTER TABLE `account`
   ADD PRIMARY KEY (`ACCOUNT_ID`),
   ADD KEY `ACCOUNT_IBFK1` (`STATUSCODE`);
-
---
--- Indexes for table `account_role`
---
-ALTER TABLE `account_role`
-  ADD PRIMARY KEY (`ACCOUNT_ROLE_ID`),
-  ADD UNIQUE KEY `ROLE_ID` (`ROLE_ID`),
-  ADD KEY `ACCOUNT_ID` (`ACCOUNT_ID`);
-
---
--- Indexes for table `account_session`
---
-ALTER TABLE `account_session`
-  ADD PRIMARY KEY (`ACCOUNT_SESSION_ID`);
 
 --
 -- Indexes for table `activity`
@@ -280,20 +216,9 @@ ALTER TABLE `activity`
 -- Indexes for table `attendance`
 --
 ALTER TABLE `attendance`
-  ADD PRIMARY KEY (`ATTENDANCE_ID`);
-
---
--- Indexes for table `event_log`
---
-ALTER TABLE `event_log`
-  ADD PRIMARY KEY (`EVENT_LOG_ID`),
-  ADD KEY `ACCOUNT_ID` (`ACCOUNT_ID`);
-
---
--- Indexes for table `role`
---
-ALTER TABLE `role`
-  ADD PRIMARY KEY (`ROLE_ID`);
+  ADD PRIMARY KEY (`ATTENDANCE_ID`),
+  ADD KEY `ATT_FK_ACT_ID` (`ACTIVITY_ID`),
+  ADD KEY `STD_FK_NUM` (`STUDENT_NUMBER`);
 
 --
 -- Indexes for table `statuscode`
@@ -309,10 +234,10 @@ ALTER TABLE `statuscode_group`
   ADD PRIMARY KEY (`STATUS_GROUP_ID`);
 
 --
--- Indexes for table `transaction_type`
+-- Indexes for table `students`
 --
-ALTER TABLE `transaction_type`
-  ADD PRIMARY KEY (`TRANSACTION_TYPE_ID`);
+ALTER TABLE `students`
+  ADD PRIMARY KEY (`STUDENT_NUMBER`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -325,12 +250,6 @@ ALTER TABLE `account`
   MODIFY `ACCOUNT_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
--- AUTO_INCREMENT for table `account_session`
---
-ALTER TABLE `account_session`
-  MODIFY `ACCOUNT_SESSION_ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `activity`
 --
 ALTER TABLE `activity`
@@ -340,13 +259,7 @@ ALTER TABLE `activity`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `ATTENDANCE_ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `role`
---
-ALTER TABLE `role`
-  MODIFY `ROLE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ATTENDANCE_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `statuscode`
@@ -371,12 +284,6 @@ ALTER TABLE `account`
   ADD CONSTRAINT `ACCOUNT_IBFK1` FOREIGN KEY (`STATUSCODE`) REFERENCES `statuscode` (`STATUSCODE_ID`);
 
 --
--- Constraints for table `account_role`
---
-ALTER TABLE `account_role`
-  ADD CONSTRAINT `ACCOUNT_ROLE_IBFK_1` FOREIGN KEY (`ACCOUNT_ID`) REFERENCES `account` (`ACCOUNT_ID`);
-
---
 -- Constraints for table `activity`
 --
 ALTER TABLE `activity`
@@ -385,10 +292,11 @@ ALTER TABLE `activity`
   ADD CONSTRAINT `ACTIVITY_IBFK_3` FOREIGN KEY (`STATUSCODE`) REFERENCES `statuscode` (`STATUSCODE_ID`);
 
 --
--- Constraints for table `event_log`
+-- Constraints for table `attendance`
 --
-ALTER TABLE `event_log`
-  ADD CONSTRAINT `EVENT_LOG_IBFK_1` FOREIGN KEY (`ACCOUNT_ID`) REFERENCES `account` (`ACCOUNT_ID`);
+ALTER TABLE `attendance`
+  ADD CONSTRAINT `ATT_FK_ACT_ID` FOREIGN KEY (`ACTIVITY_ID`) REFERENCES `activity` (`ACTIVITY_ID`),
+  ADD CONSTRAINT `STD_FK_NUM` FOREIGN KEY (`STUDENT_NUMBER`) REFERENCES `students` (`student_number`);
 
 --
 -- Constraints for table `statuscode`
