@@ -79,7 +79,7 @@ class Event(BaseModel):
     # college_id: Optional[int]
     activity_start_date: date
     activity_end_date: date
-    activity_status: Optional[str] = Field(default="inactive")
+    #activity_status: Optional[str] = Field(default="inactive")
     #datetime_created: Optional[datetime] = Field(default=datetime.now())
     # approved_by: Optional[int]
 
@@ -115,6 +115,13 @@ def get_events(db: Session = Depends(get_db)):
     events = db.query(Activity).all()
     return events
 
+@app.get("/events/{activity_id}")
+def get_event(activity_id: int, db: Session = Depends(get_db)):
+    event = db.query(Activity).filter(Activity.activity_id == activity_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return event
+
 @app.post("/events")
 def add_event(evt: Event, db: Session = Depends(get_db)):
     activity = Activity(**evt.dict())
@@ -133,8 +140,8 @@ def add_event(evt: Event, db: Session = Depends(get_db)):
     return {"message": "Event added"}
 
 @app.patch("/events/{activity_id}")
-def update_event(activity_id: int, activity: Event, db: Session = Depends(get_db)):
-    db.query(Activity).filter(Event.activity_id == activity_id).update(activity.dict())
+def update_event(activity_id: int, evt: Event, db: Session = Depends(get_db)):
+    db.query(Activity).filter(Activity.activity_id == activity_id).update(evt.dict())
     db.commit()
     return {"message": "Event updated"}
 
